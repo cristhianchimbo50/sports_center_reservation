@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block title %}Nueva Reserva{% endblock %}
+{% block content %}
+<h2>Reservar cancha</h2>
+<form method="POST">
+    Cancha:
+    <select name="court_id">
+        {% for court in courts %}
+        <option value="{{ court.id }}">{{ court.name }} ({{ court.type }})</option>
+        {% endfor %}
+    </select><br>
+    Fecha: <input type="date" name="date" required><br>
+    Horario: <input type="text" name="time_slot" placeholder="Ej: 10:00 - 11:00" required><br>
+    <button type="submit">Reservar</button>
+</form>
+{% endblock %}

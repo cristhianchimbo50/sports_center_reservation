@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block title %}Reservas{% endblock %}
+{% block content %}
+<h2>Mis Reservas</h2>
+<a href="{{ url_for('main.add_reservation') }}">Nueva reserva</a>
+<ul>
+    {% for r in reservations %}
+        <li>{{ r.date }} - {{ r.time_slot }} - {{ r.court.name }} - Estado: {{ r.status }}</li>
+    {% endfor %}
+</ul>
+{% endblock %}

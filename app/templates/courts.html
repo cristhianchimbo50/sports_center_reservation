@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block title %}Canchas{% endblock %}
+{% block content %}
+<h2>Listado de Canchas</h2>
+<a href="{{ url_for('main.add_court') }}">Añadir Cancha</a>
+<ul>
+    {% for court in courts %}
+        <li>{{ court.name }} ({{ court.type }}) - {% if court.availability %}Disponible{% else %}No disponible{% endif %}</li>
+    {% endfor %}
+</ul>
+{% endblock %}

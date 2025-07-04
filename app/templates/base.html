@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Sports Center{% endblock %}</title>
+</head>
+
+<body>
+    <nav>
+        <a href="{{ url_for('main.home') }}">Inicio</a> |
+        <a href="{{ url_for('main.register') }}">Registro</a> |
+        <a href="{{ url_for('main.login') }}">Login</a> |
+        <a href="{{ url_for('main.logout') }}">Logout</a>
+
+    </nav>
+    <hr>
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <ul>
+        {% for message in messages %}
+        <li>{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+    {% endwith %}
+    {% block content %}{% endblock %}
+</body>
+
+</html>
