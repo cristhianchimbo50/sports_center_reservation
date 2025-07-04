@@ -1,12 +1,42 @@
 {% extends 'base.html' %}
 {% block title %}Reservas{% endblock %}
 {% block content %}
-<h2 class="mb-4">Mis Reservas</h2>
-<a href="{{ url_for('main.add_reservation') }}" class="btn btn-primary mb-3">Nueva Reserva</a>
+
+<h2 class="mb-4">
+    {% if current_user.role == 'administrador' %}
+        Todas las Reservas
+    {% else %}
+        Mis Reservas
+    {% endif %}
+</h2>
+
+{% if current_user.role == 'cliente' %}
+    <a href="{{ url_for('main.add_reservation') }}" class="btn btn-primary mb-3">Nueva Reserva</a>
+{% endif %}
+
 <ul class="list-group">
     {% for r in reservations %}
         <li class="list-group-item">
-            {{ r.date }} - {{ r.time_slot }} - <strong>{{ r.court.name }}</strong> ({{ r.court.type }}) - Estado: {{ r.status }}
+            {{ r.date }} -
+            {% if r.slots %}
+                <!-- Muestra todas las franjas horarias reservadas -->
+                {{ r.slots | map(attribute='start_time') | map('string') | join(', ') }} -
+            {% elif r.time_slot %}
+                {{ r.time_slot }} -
+            {% endif %}
+            <strong>{{ r.court.name }}</strong> ({{ r.court.type }}) -
+            {% if current_user.role == 'administrador' %}
+                Usuario: <b>{{ r.user.username }}</b> -
+            {% endif %}
+            Estado: {{ r.status }}
+        </li>
+    {% else %}
+        <li class="list-group-item text-muted">
+            {% if current_user.role == 'administrador' %}
+                No hay reservas registradas.
+            {% else %}
+                No tienes reservas realizadas.
+            {% endif %}
         </li>
     {% endfor %}
 </ul>

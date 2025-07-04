@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% block title %}Horarios para {{ court.name }}{% endblock %}
+{% block content %}
+
+<h2 class="mb-4">Horarios de {{ court.name }}</h2>
+<a href="{{ url_for('main.courts') }}" class="btn btn-outline-secondary mb-3">← Volver a Canchas</a>
+
+<form method="POST" class="card p-4 mb-4 shadow-sm">
+    <div class="row g-3 align-items-end">
+        <div class="col-md-4">
+            <label class="form-label">Día de la semana</label>
+            <select name="day_of_week" class="form-select" required>
+                <option value="">Seleccione día</option>
+                <option value="Lunes">Lunes</option>
+                <option value="Martes">Martes</option>
+                <option value="Miércoles">Miércoles</option>
+                <option value="Jueves">Jueves</option>
+                <option value="Viernes">Viernes</option>
+                <option value="Sábado">Sábado</option>
+                <option value="Domingo">Domingo</option>
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label class="form-label">Hora inicio</label>
+            <input type="time" name="start_time" class="form-control" required>
+        </div>
+        <div class="col-md-3">
+            <label class="form-label">Hora fin</label>
+            <input type="time" name="end_time" class="form-control" required>
+        </div>
+        <div class="col-md-2 d-grid">
+            <button type="submit" class="btn btn-success">Agregar</button>
+        </div>
+    </div>
+</form>
+
+<h4 class="mt-4">Horarios definidos</h4>
+<ul class="list-group">
+    {% for s in schedules %}
+    <li class="list-group-item d-flex justify-content-between align-items-center">
+        <span>
+            <i class="bi bi-calendar-week"></i>
+            <b>{{ s.day_of_week }}</b>: {{ s.start_time.strftime('%H:%M') }} - {{ s.end_time.strftime('%H:%M') }}
+        </span>
+    </li>
+    {% else %}
+    <li class="list-group-item text-muted">No hay horarios aún.</li>
+    {% endfor %}
+</ul>
+
+{% endblock %}

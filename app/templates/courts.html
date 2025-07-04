@@ -1,18 +1,58 @@
 {% extends 'base.html' %}
 {% block title %}Canchas{% endblock %}
 {% block content %}
-<h2 class="mb-4">Listado de Canchas</h2>
-<a href="{{ url_for('main.add_court') }}" class="btn btn-primary mb-3">Añadir Cancha</a>
-<ul class="list-group">
-    {% for court in courts %}
-        <li class="list-group-item">
-            <strong>{{ court.name }}</strong> ({{ court.type }}) - 
-            {% if court.availability %}
-                <span class="text-success">Disponible</span>
-            {% else %}
-                <span class="text-danger">No disponible</span>
+
+<h2 class="mb-4">
+    {% if current_user.role == 'administrador' %}
+        Gestión de Canchas
+    {% else %}
+        Canchas Disponibles
+    {% endif %}
+</h2>
+
+{% if current_user.role == 'administrador' %}
+    <a href="{{ url_for('main.add_court') }}" class="btn btn-primary mb-3">+ Nueva Cancha</a>
+{% endif %}
+
+<table class="table table-bordered table-striped align-middle">
+    <thead class="table-dark">
+        <tr>
+            <th>#</th>
+            <th>Nombre</th>
+            <th>Tipo</th>
+            <th>Disponibilidad</th>
+            {% if current_user.role == 'administrador' %}
+                <th>Horarios</th>
             {% endif %}
-        </li>
-    {% endfor %}
-</ul>
+        </tr>
+    </thead>
+    <tbody>
+        {% for court in courts %}
+        <tr>
+            <td>{{ court.id }}</td>
+            <td>{{ court.name }}</td>
+            <td>{{ court.type }}</td>
+            <td>
+                {% if court.availability %}
+                    <span class="badge bg-success">Disponible</span>
+                {% else %}
+                    <span class="badge bg-secondary">No disponible</span>
+                {% endif %}
+            </td>
+            {% if current_user.role == 'administrador' %}
+                <td>
+                    <a href="{{ url_for('main.manage_court_schedule', court_id=court.id) }}" class="btn btn-outline-info btn-sm">
+                        <i class="bi bi-calendar3"></i> Horarios
+                    </a>
+                </td>
+            {% endif %}
+        </tr>
+        {% else %}
+        <tr>
+            <td colspan="{% if current_user.role == 'administrador' %}5{% else %}4{% endif %}" class="text-center text-muted">No hay canchas registradas.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
 {% endblock %}

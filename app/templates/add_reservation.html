@@ -1,26 +1,33 @@
 {% extends 'base.html' %}
 {% block title %}Nueva Reserva{% endblock %}
 {% block content %}
-<div class="w-50 mx-auto">
-    <h2 class="mb-4">Reservar cancha</h2>
-    <form method="POST">
-        <div class="mb-3">
-            <label class="form-label">Cancha</label>
-            <select name="court_id" class="form-select">
-                {% for court in courts %}
-                <option value="{{ court.id }}">{{ court.name }} ({{ court.type }})</option>
-                {% endfor %}
-            </select>
-        </div>
-        <div class="mb-3">
-            <label class="form-label">Fecha</label>
-            <input type="date" name="date" class="form-control" required>
-        </div>
-        <div class="mb-3">
-            <label class="form-label">Horario</label>
-            <input type="text" name="time_slot" class="form-control" placeholder="Ej: 10:00 - 11:00" required>
-        </div>
-        <button type="submit" class="btn btn-success">Reservar</button>
-    </form>
-</div>
+
+<h2 class="mb-4">Crear Reserva</h2>
+
+<form method="POST" class="mb-4" id="reservationForm">
+    <div class="mb-3">
+        <label class="form-label">Cancha</label>
+        <select name="court_id" id="courtSelect" class="form-select" required>
+            <option value="">Seleccione una cancha</option>
+            {% for court in courts %}
+            <option value="{{ court.id }}">{{ court.name }} ({{ court.type }})</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Fecha</label>
+        <input type="date" name="date" id="dateSelect" class="form-control" required>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Horarios disponibles</label>
+        <div id="slotsContainer" class="d-flex flex-wrap gap-2"></div>
+    </div>
+
+    <button type="submit" class="btn btn-success">Reservar</button>
+</form>
+
+<script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
+
 {% endblock %}

@@ -1,18 +1,28 @@
 from . import db
 from flask_login import UserMixin
 
-# User
+# ------------------ User ------------------
+
 class User(UserMixin, db.Model):
     __tablename__ = 'users'
 
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
     password = db.Column(db.String(128), nullable=False)
+    role = db.Column(db.String(20), default='cliente', nullable=False)  # 'cliente' o 'administrador'
 
-    # Relación con reservas
-    reservations = db.relationship('Reservation', back_populates='user')
+    # Relaciones
+    reservations = db.relationship('Reservation', back_populates='user', cascade='all, delete-orphan')
 
-# Court
+    def is_admin(self):
+        return self.role == 'administrador'
+
+    def is_cliente(self):
+        return self.role == 'cliente'
+
+
+# ------------------ Court ------------------
+
 class Court(db.Model):
     __tablename__ = 'courts'
 
@@ -21,10 +31,13 @@ class Court(db.Model):
     type = db.Column(db.String(50), nullable=False)  # Fútbol, Tenis, Básquet
     availability = db.Column(db.Boolean, default=True)
 
-    # Relación con reservas
-    reservations = db.relationship('Reservation', back_populates='court')
+    # Relaciones
+    reservations = db.relationship('Reservation', back_populates='court', cascade='all, delete-orphan')
+    schedules = db.relationship('CourtSchedule', back_populates='court', cascade='all, delete-orphan')
 
-# Reservation
+
+# ------------------ Reservation ------------------
+
 class Reservation(db.Model):
     __tablename__ = 'reservations'
 
@@ -32,15 +45,31 @@ class Reservation(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     court_id = db.Column(db.Integer, db.ForeignKey('courts.id'), nullable=False)
     date = db.Column(db.Date, nullable=False)
-    time_slot = db.Column(db.String(20), nullable=False)  # Ejemplo: "10:00 - 11:00"
     status = db.Column(db.String(20), default='Pending')
 
     # Relaciones
     user = db.relationship('User', back_populates='reservations')
     court = db.relationship('Court', back_populates='reservations')
     payment = db.relationship('Payment', back_populates='reservation', uselist=False)
+    slots = db.relationship('ReservationSlot', back_populates='reservation', cascade='all, delete-orphan')
 
-# Payment
+
+# ------------------ ReservationSlot ------------------
+
+class ReservationSlot(db.Model):
+    __tablename__ = 'reservation_slots'
+
+    id = db.Column(db.Integer, primary_key=True)
+    reservation_id = db.Column(db.Integer, db.ForeignKey('reservations.id'), nullable=False)
+    start_time = db.Column(db.Time, nullable=False)
+    end_time = db.Column(db.Time, nullable=False)
+
+    # Relación inversa
+    reservation = db.relationship('Reservation', back_populates='slots')
+
+
+# ------------------ Payment ------------------
+
 class Payment(db.Model):
     __tablename__ = 'payments'
 
@@ -50,5 +79,18 @@ class Payment(db.Model):
     payment_date = db.Column(db.DateTime, nullable=False)
     status = db.Column(db.String(20), default='Paid')
 
-    # Relación con reserva
     reservation = db.relationship('Reservation', back_populates='payment')
+
+
+# ------------------ Court Schedule ------------------
+
+class CourtSchedule(db.Model):
+    __tablename__ = 'court_schedules'
+
+    id = db.Column(db.Integer, primary_key=True)
+    court_id = db.Column(db.Integer, db.ForeignKey('courts.id'), nullable=False)
+    day_of_week = db.Column(db.String(20), nullable=False)  # Ej: 'Lunes', 'Martes'
+    start_time = db.Column(db.Time, nullable=False)
+    end_time = db.Column(db.Time, nullable=False)
+
+    court = db.relationship('Court', back_populates='schedules')

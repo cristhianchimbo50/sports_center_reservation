@@ -25,45 +25,73 @@
             <i class="fas fa-home"></i> <span>Inicio</span>
         </a>
 
-        <!-- Canchas -->
-        <div class="nav-link mb-2" data-bs-toggle="collapse" href="#courtsSubmenu" role="button" aria-expanded="false">
-            <i class="fas fa-futbol"></i> <span>Canchas</span>
-            <i class="fas fa-chevron-down ms-auto"></i>
-        </div>
-        <div class="collapse ms-3" id="courtsSubmenu">
-            <a href="{{ url_for('main.list_courts') }}" class="nav-link mb-1">
-                <i class="fas fa-list"></i> <span>Ver Canchas</span>
-            </a>
-            <a href="{{ url_for('main.add_court') }}" class="nav-link mb-1">
-                <i class="fas fa-plus"></i> <span>Añadir Cancha</span>
-            </a>
-        </div>
+        {% if current_user.is_authenticated %}
+            {% if current_user.role == 'administrador' %}
+                <!-- ADMINISTRADOR -->
+                <div class="nav-link mb-2" data-bs-toggle="collapse" href="#courtsSubmenu" role="button" aria-expanded="false">
+                    <i class="fas fa-futbol"></i> <span>Gestionar Canchas</span>
+                    <i class="fas fa-chevron-down ms-auto"></i>
+                </div>
+                <div class="collapse ms-3" id="courtsSubmenu">
+                    <a href="{{ url_for('main.list_courts') }}" class="nav-link mb-1">
+                        <i class="fas fa-list"></i> <span>Ver Canchas</span>
+                    </a>
+                    <a href="{{ url_for('main.add_court') }}" class="nav-link mb-1">
+                        <i class="fas fa-plus"></i> <span>Añadir Cancha</span>
+                    </a>
+                </div>
 
-        <!-- Reservas -->
-        <div class="nav-link mb-2" data-bs-toggle="collapse" href="#reservationsSubmenu" role="button" aria-expanded="false">
-            <i class="fas fa-calendar-alt"></i> <span>Reservas</span>
-            <i class="fas fa-chevron-down ms-auto"></i>
-        </div>
-        <div class="collapse ms-3" id="reservationsSubmenu">
-            <a href="{{ url_for('main.list_reservations') }}" class="nav-link mb-1">
-                <i class="fas fa-list"></i> <span>Ver Reservas</span>
-            </a>
-            <a href="{{ url_for('main.add_reservation') }}" class="nav-link mb-1">
-                <i class="fas fa-plus"></i> <span>Nueva Reserva</span>
-            </a>
-        </div>
+                <div class="nav-link mb-2" data-bs-toggle="collapse" href="#reservationsSubmenu" role="button" aria-expanded="false">
+                    <i class="fas fa-calendar-alt"></i> <span>Reservas</span>
+                    <i class="fas fa-chevron-down ms-auto"></i>
+                </div>
+                <div class="collapse ms-3" id="reservationsSubmenu">
+                    <a href="{{ url_for('main.list_reservations') }}" class="nav-link mb-1">
+                        <i class="fas fa-list"></i> <span>Ver Todas las Reservas</span>
+                    </a>
+                </div>
+            {% elif current_user.role == 'cliente' %}
+                <!-- CLIENTE -->
+                <div class="nav-link mb-2" data-bs-toggle="collapse" href="#courtsSubmenu" role="button" aria-expanded="false">
+                    <i class="fas fa-futbol"></i> <span>Canchas</span>
+                    <i class="fas fa-chevron-down ms-auto"></i>
+                </div>
+                <div class="collapse ms-3" id="courtsSubmenu">
+                    <a href="{{ url_for('main.list_courts') }}" class="nav-link mb-1">
+                        <i class="fas fa-list"></i> <span>Ver Canchas</span>
+                    </a>
+                </div>
 
-        <hr class="text-white">
+                <div class="nav-link mb-2" data-bs-toggle="collapse" href="#reservationsSubmenu" role="button" aria-expanded="false">
+                    <i class="fas fa-calendar-alt"></i> <span>Reservas</span>
+                    <i class="fas fa-chevron-down ms-auto"></i>
+                </div>
+                <div class="collapse ms-3" id="reservationsSubmenu">
+                    <a href="{{ url_for('main.list_reservations') }}" class="nav-link mb-1">
+                        <i class="fas fa-list"></i> <span>Mis Reservas</span>
+                    </a>
+                    <a href="{{ url_for('main.add_reservation') }}" class="nav-link mb-1">
+                        <i class="fas fa-plus"></i> <span>Nueva Reserva</span>
+                    </a>
+                </div>
+            {% endif %}
 
-        <a href="{{ url_for('main.register') }}" class="nav-link mb-2">
-            <i class="fas fa-user-plus"></i> <span>Registro</span>
-        </a>
-        <a href="{{ url_for('main.login') }}" class="nav-link mb-2">
-            <i class="fas fa-sign-in-alt"></i> <span>Login</span>
-        </a>
-        <a href="{{ url_for('main.logout') }}" class="nav-link">
-            <i class="fas fa-sign-out-alt"></i> <span>Logout</span>
-        </a>
+            <hr class="text-white">
+
+            <span class="text-light ms-1 mb-2">
+                <i class="fas fa-user"></i> {{ current_user.username }} ({{ current_user.role|capitalize }})
+            </span>
+            <a href="{{ url_for('main.logout') }}" class="nav-link mt-2">
+                <i class="fas fa-sign-out-alt"></i> <span>Logout</span>
+            </a>
+        {% else %}
+            <a href="{{ url_for('main.register') }}" class="nav-link mb-2">
+                <i class="fas fa-user-plus"></i> <span>Registro</span>
+            </a>
+            <a href="{{ url_for('main.login') }}" class="nav-link mb-2">
+                <i class="fas fa-sign-in-alt"></i> <span>Login</span>
+            </a>
+        {% endif %}
     </div>
 
     <!-- Contenido principal -->
@@ -84,6 +112,7 @@
 
 <!-- Bootstrap + Scripts -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 <script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
 
 </body>
