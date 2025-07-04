@@ -1,11 +1,3 @@
-{% if current_user.role != 'administrador' %}
-<div class="alert alert-danger">
-    Acceso solo para administradores.
-</div>
-{% return %}
-{% endif %}
-
-
 {% extends 'base.html' %}
 {% block title %}Añadir Cancha{% endblock %}
 {% block content %}

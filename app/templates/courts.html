@@ -21,9 +21,6 @@
             <th>Nombre</th>
             <th>Tipo</th>
             <th>Disponibilidad</th>
-            {% if current_user.role == 'administrador' %}
-                <th>Horarios</th>
-            {% endif %}
         </tr>
     </thead>
     <tbody>
@@ -40,11 +37,6 @@
                 {% endif %}
             </td>
             {% if current_user.role == 'administrador' %}
-                <td>
-                    <a href="{{ url_for('main.manage_court_schedule', court_id=court.id) }}" class="btn btn-outline-info btn-sm">
-                        <i class="bi bi-calendar3"></i> Horarios
-                    </a>
-                </td>
             {% endif %}
         </tr>
         {% else %}
