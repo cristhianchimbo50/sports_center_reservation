@@ -4,40 +4,117 @@
 
 <h2 class="mb-4">
     {% if current_user.role == 'administrador' %}
-        Todas las Reservas
+    Todas las Reservas
     {% else %}
-        Mis Reservas
+    Mis Reservas
     {% endif %}
 </h2>
 
 {% if current_user.role == 'cliente' %}
-    <a href="{{ url_for('main.add_reservation') }}" class="btn btn-primary mb-3">Nueva Reserva</a>
+<a href="{{ url_for('main.add_reservation') }}" class="btn btn-primary mb-3">Nueva Reserva</a>
 {% endif %}
 
-<ul class="list-group">
-    {% for r in reservations %}
-        <li class="list-group-item">
-            {{ r.date }} -
-            {% if r.slots %}
-                <!-- Muestra todas las franjas horarias reservadas -->
-                {{ r.slots | map(attribute='start_time') | map('string') | join(', ') }} -
-            {% elif r.time_slot %}
-                {{ r.time_slot }} -
-            {% endif %}
-            <strong>{{ r.court.name }}</strong> ({{ r.court.type }}) -
+{% if reservations %}
+<table class="table table-hover table-striped align-middle">
+    <thead class="table-dark">
+        <tr>
+            <th>Fecha</th>
+            <th>Cancha</th>
+            <th>Horarios</th>
             {% if current_user.role == 'administrador' %}
-                Usuario: <b>{{ r.user.username }}</b> -
+            <th>Usuario</th>
             {% endif %}
-            Estado: {{ r.status }}
-        </li>
+            <th>Estado</th>
+            <th>Pago</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for r in reservations %}
+        <tr>
+            <td>{{ r.date.strftime('%d/%m/%Y') }}</td>
+            <td><strong>{{ r.court.name }}</strong> ({{ r.court.type }})</td>
+            <td>
+                {% if r.slots %}
+                {% for slot in r.slots %}
+                <span class="badge bg-info text-dark mb-1">
+                    {{ slot.start_time.strftime('%I:%M %p') }} - {{ slot.end_time.strftime('%I:%M %p') }}
+                </span>
+                {% if not loop.last %}<br>{% endif %}
+                {% endfor %}
+                {% endif %}
+            </td>
+            {% if current_user.role == 'administrador' %}
+            <td>{{ r.user.username }}</td>
+            {% endif %}
+            <td>{{ r.status }}</td>
+            <td>
+                {% if r.payment %}
+                ${{ '%.2f' % r.payment.amount }} <span class="badge bg-success">{{ r.payment.status }}</span>
+                {% else %}
+                <span class="badge bg-secondary">Sin pago</span>
+                {% endif %}
+            </td>
+            <td>
+                <!-- Botón ver detalles -->
+                <button type="button" class="btn btn-outline-info btn-sm" data-bs-toggle="modal"
+                    data-bs-target="#detalleReservaModal" onclick="showReservaDetalle('{{ r.id }}')">
+                    <i class="bi bi-eye"></i>
+                </button>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<div class="alert alert-info mt-3">
+    {% if current_user.role == 'administrador' %}
+    No hay reservas registradas.
     {% else %}
-        <li class="list-group-item text-muted">
-            {% if current_user.role == 'administrador' %}
-                No hay reservas registradas.
-            {% else %}
-                No tienes reservas realizadas.
-            {% endif %}
-        </li>
+    No tienes reservas realizadas.
+    {% endif %}
+</div>
+{% endif %}
+
+<!-- Modal para detalles de reserva -->
+<div class="modal fade" id="detalleReservaModal" tabindex="-1" aria-labelledby="detalleReservaModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="detalleReservaModalLabel">Detalle de Reserva</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body" id="modalReservaBody">
+                <div class="text-center text-muted">Cargando...</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+window.RESERVAS = [
+    {% for r in reservations %}
+    {
+        id: '{{ r.id }}',
+        date: '{{ r.date.strftime("%d/%m/%Y") }}',
+        court: '{{ r.court.name }} ({{ r.court.type }})',
+        {% if current_user.role == 'administrador' %}
+        user: '{{ r.user.username }}',
+        {% endif %}
+        horarios: [
+            {% for slot in r.slots %}
+            '{{ slot.start_time.strftime("%I:%M %p") }} - {{ slot.end_time.strftime("%I:%M %p") }}'
+            {% if not loop.last %},{% endif %}
+            {% endfor %}
+        ],
+        estado: '{{ r.status }}',
+        pago: '{% if r.payment %}${{ "%.2f"|format(r.payment.amount) }} - {{ r.payment.status }}{% else %}Sin pago{% endif %}'
+    }{% if not loop.last %},{% endif %}
     {% endfor %}
-</ul>
+];
+</script>
+<script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
+
+
 {% endblock %}

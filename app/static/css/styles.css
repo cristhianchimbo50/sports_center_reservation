@@ -64,3 +64,26 @@ body {
     font-family: 'Segoe UI', Roboto, sans-serif;
     background-color: #f8f9fa;
 }
+
+/* Que el área de horarios nunca supere el 100% del contenedor principal */
+#slotsContainer {
+    max-width: 900px;
+    margin: 0 auto;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: flex-start; /* Cambia a center si quieres centrado */
+}
+
+#slotsContainer .col {
+    flex: 1 1 210px; /* Ajusta el ancho mínimo de cada slot, prueba entre 180-220px */
+    min-width: 180px;
+    max-width: 240px;
+    margin-bottom: 8px;
+}
+
+/* Opcional: Si quieres que el botón ocupe toda la columna */
+#slotsContainer label.btn {
+    width: 100%;
+    text-align: center;
+}

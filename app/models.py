@@ -30,6 +30,7 @@ class Court(db.Model):
     name = db.Column(db.String(80), unique=True, nullable=False)
     type = db.Column(db.String(50), nullable=False)  # Fútbol, Tenis, Básquet
     availability = db.Column(db.Boolean, default=True)
+    price_per_hour = db.Column(db.Numeric(10, 2), default=0)
 
     # Relaciones
     reservations = db.relationship('Reservation', back_populates='court', cascade='all, delete-orphan')

@@ -104,7 +104,8 @@ def add_court():
             flash('Ya existe una cancha con ese nombre')
             return redirect(url_for('main.add_court'))
 
-        court = Court(name=name, type=type_, availability=True)
+        price = request.form.get('price_per_hour', type=float)
+        court = Court(name=name, type=type_, availability=True, price_per_hour=price)
         db.session.add(court)
         db.session.commit()
 
@@ -153,23 +154,25 @@ def list_reservations():
         return render_template('reservations.html', reservations=reservations, admin=False)
 
 @main_bp.route('/add-reservation', methods=['GET', 'POST'])
-@cliente_required
+@login_required
 def add_reservation():
-    courts = Court.query.filter_by(availability=True).all()
+    courts = Court.query.all()
 
     if request.method == 'POST':
-        court_id_str = request.form.get('court_id')
+        court_id = int(request.form.get('court_id'))
         date_str = request.form.get('date')
-        selected_slots = request.form.getlist('slots')  # slots es una lista de strings 'HH:MM-HH:MM'
+        selected_slots = request.form.getlist('slots')
 
-        if not court_id_str or not date_str or not selected_slots:
+        if not court_id or not date_str or not selected_slots:
             flash('Debe seleccionar cancha, fecha y al menos un horario disponible.')
             return redirect(url_for('main.add_reservation'))
 
-        court_id = int(court_id_str)
         selected_date = datetime.date.fromisoformat(date_str)
+        court = Court.query.get(court_id)
+        price_per_hour = float(court.price_per_hour)
+        total_to_pay = price_per_hour * len(selected_slots)
 
-        # Validación: asegurarse que todos los horarios elegidos estén disponibles
+        # Validar que los slots realmente están disponibles
         for slot in selected_slots:
             start_str, end_str = slot.split('-')
             start_time = datetime.datetime.strptime(start_str, '%H:%M').time()
@@ -188,17 +191,17 @@ def add_reservation():
                 flash(f'La franja {slot} ya está reservada. Seleccione solo horarios disponibles.')
                 return redirect(url_for('main.add_reservation'))
 
-        # Crear la reserva principal
+        # 1. Crear reserva principal
         reservation = Reservation(
             user_id=current_user.id,
             court_id=court_id,
             date=selected_date,
-            status='Paid'  # simulamos el pago exitoso
+            status='Paid'  # O 'Pendiente', según tu flujo
         )
         db.session.add(reservation)
-        db.session.commit()  # Necesario para obtener el reservation.id
+        db.session.commit()
 
-        # Insertar todos los slots seleccionados
+        # 2. Insertar slots seleccionados
         for slot in selected_slots:
             start_str, end_str = slot.split('-')
             start_time = datetime.datetime.strptime(start_str, '%H:%M').time()
@@ -211,7 +214,17 @@ def add_reservation():
             db.session.add(slot_obj)
         db.session.commit()
 
-        flash('Reserva creada exitosamente.')
+        # 3. Guardar el pago asociado
+        payment = Payment(
+            reservation_id=reservation.id,
+            amount=total_to_pay,
+            payment_date=datetime.datetime.now(),
+            status='Paid'
+        )
+        db.session.add(payment)
+        db.session.commit()
+
+        flash('Reserva y pago registrados exitosamente.')
         return redirect(url_for('main.list_reservations'))
 
     return render_template('add_reservation.html', courts=courts)

@@ -1,8 +1,8 @@
 {% if current_user.role != 'administrador' %}
-    <div class="alert alert-danger">
-        Acceso solo para administradores.
-    </div>
-    {% return %}
+<div class="alert alert-danger">
+    Acceso solo para administradores.
+</div>
+{% return %}
 {% endif %}
 
 
@@ -24,6 +24,12 @@
                 <option value="Básquet">Básquet</option>
             </select>
         </div>
+
+        <div class="mb-3">
+            <label class="form-label">Precio por hora ($)</label>
+            <input type="number" step="0.01" min="0" name="price_per_hour" class="form-control" required>
+        </div>
+
         <button type="submit" class="btn btn-success">Agregar</button>
     </form>
 </div>

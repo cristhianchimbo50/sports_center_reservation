@@ -10,7 +10,7 @@
         <select name="court_id" id="courtSelect" class="form-select" required>
             <option value="">Seleccione una cancha</option>
             {% for court in courts %}
-            <option value="{{ court.id }}">{{ court.name }} ({{ court.type }})</option>
+            <option value="{{ court.id }}" data-price="{{ court.price_per_hour }}">{{ court.name }} ({{ court.type }})</option>
             {% endfor %}
         </select>
     </div>
@@ -22,12 +22,53 @@
 
     <div class="mb-3">
         <label class="form-label">Horarios disponibles</label>
-        <div id="slotsContainer" class="d-flex flex-wrap gap-2"></div>
+        <div id="slotsContainer" class="mb-2"></div>
     </div>
 
-    <button type="submit" class="btn btn-success">Reservar</button>
+    <div class="mb-3">
+        <label class="form-label">Precio por hora: </label>
+        <span id="pricePerHour" class="fw-bold">$0.00</span>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Total a pagar:</label>
+        <span id="totalAmount" class="fw-bold">$0.00</span>
+    </div>
+
+    <button type="button" class="btn btn-success" id="openPaymentModal" disabled>Reservar</button>
 </form>
 
+<!-- Modal de pago Bootstrap -->
+<div class="modal fade" id="paymentModal" tabindex="-1" aria-labelledby="paymentModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form id="paymentForm">
+        <div class="modal-header">
+          <h5 class="modal-title" id="paymentModalLabel">Datos de Pago</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label>Nombre en la tarjeta</label>
+            <input type="text" class="form-control" name="card_name" required>
+          </div>
+          <div class="mb-3">
+            <label>Número de tarjeta</label>
+            <input type="text" class="form-control" name="card_number" maxlength="16" required>
+          </div>
+          <div class="mb-3">
+            <label>Monto a pagar</label>
+            <input type="text" class="form-control" id="modalAmount" readonly>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary">Pagar y Reservar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
 <script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
+
 
 {% endblock %}
