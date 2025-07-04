@@ -1,0 +1,66 @@
+/* Sidebar moderno */
+.sidebar {
+    height: 100vh;
+    width: 250px;
+    transition: all 0.3s ease;
+    background-color: #162B4E;
+    border-right: 1px solid #ddd;
+    border-top-right-radius: 15px;
+    border-bottom-right-radius: 15px;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+
+.sidebar.collapsed {
+    width: 80px;
+}
+
+.sidebar .nav-link {
+    white-space: nowrap;
+    overflow: hidden;
+    color: #cecbcb;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    padding: 10px 15px;
+    border-radius: 8px;
+    margin-bottom: 5px;
+    transition: background-color 0.2s;
+}
+
+.sidebar .nav-link i {
+    margin-right: 12px;
+    font-size: 1.2rem;
+}
+
+.sidebar .nav-link:hover {
+    color: #162B4E;;
+    background-color: #f1f1f1;
+}
+
+.sidebar.collapsed .nav-link span {
+    display: none;
+}
+
+.sidebar .btn {
+    margin-bottom: 20px;
+    width: 100%;
+}
+
+/* Botones */
+.btn-primary {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+}
+
+.btn-success {
+    background-color: #198754;
+    border-color: #198754;
+}
+
+/* Fuente global */
+body {
+    font-family: 'Segoe UI', Roboto, sans-serif;
+    background-color: #f8f9fa;
+}

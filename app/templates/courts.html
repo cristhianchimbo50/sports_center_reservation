@@ -1,11 +1,18 @@
 {% extends 'base.html' %}
 {% block title %}Canchas{% endblock %}
 {% block content %}
-<h2>Listado de Canchas</h2>
-<a href="{{ url_for('main.add_court') }}">Añadir Cancha</a>
-<ul>
+<h2 class="mb-4">Listado de Canchas</h2>
+<a href="{{ url_for('main.add_court') }}" class="btn btn-primary mb-3">Añadir Cancha</a>
+<ul class="list-group">
     {% for court in courts %}
-        <li>{{ court.name }} ({{ court.type }}) - {% if court.availability %}Disponible{% else %}No disponible{% endif %}</li>
+        <li class="list-group-item">
+            <strong>{{ court.name }}</strong> ({{ court.type }}) - 
+            {% if court.availability %}
+                <span class="text-success">Disponible</span>
+            {% else %}
+                <span class="text-danger">No disponible</span>
+            {% endif %}
+        </li>
     {% endfor %}
 </ul>
 {% endblock %}

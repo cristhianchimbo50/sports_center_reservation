@@ -1,15 +1,22 @@
 {% extends 'base.html' %}
 {% block title %}Añadir Cancha{% endblock %}
 {% block content %}
-<h2>Registrar nueva cancha</h2>
-<form method="POST">
-    Nombre: <input type="text" name="name" required><br>
-    Tipo: 
-    <select name="type">
-        <option value="Fútbol">Fútbol</option>
-        <option value="Tenis">Tenis</option>
-        <option value="Básquet">Básquet</option>
-    </select><br>
-    <button type="submit">Agregar</button>
-</form>
+<div class="w-50 mx-auto">
+    <h2 class="mb-4">Registrar nueva cancha</h2>
+    <form method="POST">
+        <div class="mb-3">
+            <label class="form-label">Nombre</label>
+            <input type="text" name="name" class="form-control" required>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Tipo</label>
+            <select name="type" class="form-select">
+                <option value="Fútbol">Fútbol</option>
+                <option value="Tenis">Tenis</option>
+                <option value="Básquet">Básquet</option>
+            </select>
+        </div>
+        <button type="submit" class="btn btn-success">Agregar</button>
+    </form>
+</div>
 {% endblock %}

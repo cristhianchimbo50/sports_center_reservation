@@ -1,11 +1,13 @@
 {% extends 'base.html' %}
 {% block title %}Reservas{% endblock %}
 {% block content %}
-<h2>Mis Reservas</h2>
-<a href="{{ url_for('main.add_reservation') }}">Nueva reserva</a>
-<ul>
+<h2 class="mb-4">Mis Reservas</h2>
+<a href="{{ url_for('main.add_reservation') }}" class="btn btn-primary mb-3">Nueva Reserva</a>
+<ul class="list-group">
     {% for r in reservations %}
-        <li>{{ r.date }} - {{ r.time_slot }} - {{ r.court.name }} - Estado: {{ r.status }}</li>
+        <li class="list-group-item">
+            {{ r.date }} - {{ r.time_slot }} - <strong>{{ r.court.name }}</strong> ({{ r.court.type }}) - Estado: {{ r.status }}
+        </li>
     {% endfor %}
 </ul>
 {% endblock %}

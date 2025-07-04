@@ -130,3 +130,8 @@ def add_reservation():
         return redirect(url_for('main.list_reservations'))
 
     return render_template('add_reservation.html', courts=courts)
+
+# Manejar el error 401
+@main_bp.app_errorhandler(401)
+def unauthorized(error):
+    return render_template('401.html'), 401
