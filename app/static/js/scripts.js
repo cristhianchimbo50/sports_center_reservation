@@ -2,6 +2,7 @@ function toggleSidebar() {
     document.getElementById('sidebar').classList.toggle('collapsed');
 }
 
+// Actualiza el campo de día de la semana basado en la fecha seleccionada
 function updateDayOfWeek() {
     const input = document.querySelector('input[name="selected_date"]');
     const output = document.getElementById('dayOfWeek');
@@ -19,10 +20,11 @@ function updateDayOfWeek() {
 
 // --- Reserva: lógica de slots, precio, y pago (solo en add_reservation.html) ---
 document.addEventListener('DOMContentLoaded', function() {
-    // --- Horarios en modo "select simple" para otros formularios (si lo usas) ---
     const courtSelect = document.getElementById('courtSelect');
     const dateSelect = document.getElementById('dateSelect');
     const timeSlotSelect = document.getElementById('timeSlotSelect');
+
+    // Solo aplica en formularios con selección simple de horario
     if (courtSelect && dateSelect && timeSlotSelect) {
         async function loadAvailableSlots() {
             const courtId = courtSelect.value;
@@ -52,7 +54,7 @@ document.addEventListener('DOMContentLoaded', function() {
         dateSelect.addEventListener('change', loadAvailableSlots);
     }
 
-    // --- Horarios con checkboxes (add_reservation.html) y pago ---
+    // Horarios en formato checkboxes + cálculo de precio total (solo si los elementos existen)
     const slotsContainer = document.getElementById('slotsContainer');
     const pricePerHourSpan = document.getElementById('pricePerHour');
     const totalAmountSpan = document.getElementById('totalAmount');
@@ -60,19 +62,21 @@ document.addEventListener('DOMContentLoaded', function() {
     const modalAmount = document.getElementById('modalAmount');
     let pricePerHour = 0;
 
-    // Ejecutar SOLO si existen los elementos (es decir, estamos en la página de reservas)
     if (courtSelect && dateSelect && slotsContainer) {
+        // Convierte un horario "HH:mm" a formato 12 horas
         function toAmPm(hhmm) {
             let [h, m] = hhmm.split(':').map(Number);
             const suffix = h >= 12 ? 'PM' : 'AM';
             h = ((h % 12) || 12);
             return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')} ${suffix}`;
         }
+        // Convierte un slot "HH:mm-HH:mm" a formato legible
         function slotToAmPm(slot) {
             const [start, end] = slot.split('-');
             return `${toAmPm(start)} - ${toAmPm(end)}`;
         }
 
+        // Consulta y muestra horarios disponibles para la cancha y fecha seleccionada
         async function loadAvailableHours() {
             slotsContainer.innerHTML = '';
             const courtId = courtSelect.value;
@@ -118,11 +122,13 @@ document.addEventListener('DOMContentLoaded', function() {
             updateTotal();
         }
 
+        // Retorna el precio por hora según la cancha seleccionada
         function getCurrentPricePerHour() {
             const selected = courtSelect.selectedOptions[0];
             return selected && selected.dataset.price ? parseFloat(selected.dataset.price) : 0;
         }
 
+        // Calcula y actualiza el total a pagar según horarios seleccionados
         function updateTotal() {
             pricePerHour = getCurrentPricePerHour();
             if (pricePerHourSpan) pricePerHourSpan.textContent = `$${pricePerHour.toFixed(2)}`;
@@ -156,17 +162,14 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
 
-        // Inicialización
         updateTotal();
     }
 });
 
-
-// --- Detalle de reserva en modal ---
+// --- Detalle de reserva en modal usando datos globales renderizados por backend ---
 window.RESERVAS = window.RESERVAS || [];
 
 window.showReservaDetalle = function(reservaId) {
-    // Si lo pasas como string en el template, compara como string
     reservaId = String(reservaId);
     const reserva = window.RESERVAS.find(r => String(r.id) === reservaId);
     const modalBody = document.getElementById('modalReservaBody');

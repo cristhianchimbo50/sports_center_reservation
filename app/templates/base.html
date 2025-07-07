@@ -15,7 +15,7 @@
 <body>
 
 <div class="d-flex">
-    <!-- Sidebar -->
+    <!-- Sidebar lateral con navegación dinámica según el rol del usuario -->
     <div class="sidebar p-3" id="sidebar">
         <button class="btn btn-outline-light mb-3" onclick="toggleSidebar()">
             <i class="fas fa-bars"></i>
@@ -27,7 +27,7 @@
 
         {% if current_user.is_authenticated %}
             {% if current_user.role == 'administrador' %}
-                <!-- ADMINISTRADOR -->
+                <!-- Opciones de navegación exclusivas para el administrador -->
                 <div class="nav-link mb-2" data-bs-toggle="collapse" href="#courtsSubmenu" role="button" aria-expanded="false">
                     <i class="fas fa-futbol"></i> <span>Gestionar Canchas</span>
                     <i class="fas fa-chevron-down ms-auto"></i>
@@ -51,7 +51,7 @@
                     </a>
                 </div>
             {% elif current_user.role == 'cliente' %}
-                <!-- CLIENTE -->
+                <!-- Opciones de navegación para cliente -->
                 <div class="nav-link mb-2" data-bs-toggle="collapse" href="#courtsSubmenu" role="button" aria-expanded="false">
                     <i class="fas fa-futbol"></i> <span>Canchas</span>
                     <i class="fas fa-chevron-down ms-auto"></i>
@@ -78,6 +78,7 @@
 
             <hr class="text-white">
 
+            <!-- Muestra el usuario y rol en sesión -->
             <span class="text-light ms-1 mb-2">
                 <i class="fas fa-user"></i> {{ current_user.username }} ({{ current_user.role|capitalize }})
             </span>
@@ -85,6 +86,7 @@
                 <i class="fas fa-sign-out-alt"></i> <span>Logout</span>
             </a>
         {% else %}
+            <!-- Opciones para usuario no autenticado -->
             <a href="{{ url_for('main.register') }}" class="nav-link mb-2">
                 <i class="fas fa-user-plus"></i> <span>Registro</span>
             </a>
@@ -94,10 +96,11 @@
         {% endif %}
     </div>
 
-    <!-- Contenido principal -->
+    <!-- Contenedor del contenido principal (páginas) -->
     <div class="flex-grow-1 p-4">
         {% with messages = get_flashed_messages() %}
             {% if messages %}
+                <!-- Alerta para mensajes flash (éxito, error, etc.) -->
                 <div class="alert alert-info">
                     {% for message in messages %}
                         <div>{{ message }}</div>

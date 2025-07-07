@@ -1,4 +1,4 @@
-/* Sidebar moderno */
+/* Sidebar moderno: menú lateral fijo con transición y diseño personalizado */
 .sidebar {
     height: 100vh;
     width: 250px;
@@ -11,78 +11,35 @@
     overflow: hidden;
 }
 
-
+/* Sidebar colapsado: ancho mínimo cuando está plegado */
 .sidebar.collapsed {
     width: 80px;
 }
 
-.sidebar .nav-link {
-    white-space: nowrap;
-    overflow: hidden;
-    color: #cecbcb;
-    font-weight: 500;
-    display: flex;
-    align-items: center;
-    padding: 10px 15px;
-    border-radius: 8px;
-    margin-bottom: 5px;
-    transition: background-color 0.2s;
-}
-
-.sidebar .nav-link i {
-    margin-right: 12px;
-    font-size: 1.2rem;
-}
-
-.sidebar .nav-link:hover {
-    color: #162B4E;;
-    background-color: #f1f1f1;
-}
-
+/* Oculta texto de los enlaces en modo colapsado */
 .sidebar.collapsed .nav-link span {
     display: none;
 }
 
-.sidebar .btn {
-    margin-bottom: 20px;
-    width: 100%;
-}
-
-/* Botones */
-.btn-primary {
-    background-color: #0d6efd;
-    border-color: #0d6efd;
-}
-
-.btn-success {
-    background-color: #198754;
-    border-color: #198754;
-}
-
-/* Fuente global */
-body {
-    font-family: 'Segoe UI', Roboto, sans-serif;
-    background-color: #f8f9fa;
-}
-
-/* Que el área de horarios nunca supere el 100% del contenedor principal */
+/* Área de horarios: mantiene los slots ordenados y responsivos */
 #slotsContainer {
     max-width: 900px;
     margin: 0 auto;
     display: flex;
     flex-wrap: wrap;
     gap: 12px;
-    justify-content: flex-start; /* Cambia a center si quieres centrado */
+    justify-content: flex-start;
 }
 
+/* Cada slot ocupa mínimo 180px, máximo 240px, crece de forma flexible */
 #slotsContainer .col {
-    flex: 1 1 210px; /* Ajusta el ancho mínimo de cada slot, prueba entre 180-220px */
+    flex: 1 1 210px;
     min-width: 180px;
     max-width: 240px;
     margin-bottom: 8px;
 }
 
-/* Opcional: Si quieres que el botón ocupe toda la columna */
+/* Que el botón de slot ocupe todo el ancho disponible */
 #slotsContainer label.btn {
     width: 100%;
     text-align: center;

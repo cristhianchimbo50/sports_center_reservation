@@ -3,6 +3,7 @@
 {% block content %}
 
 <h2 class="mb-4">
+    {# Muestra un título diferente según el rol del usuario #}
     {% if current_user.role == 'administrador' %}
         Gestión de Canchas
     {% else %}
@@ -11,6 +12,7 @@
 </h2>
 
 {% if current_user.role == 'administrador' %}
+    <!-- Botón visible solo para administradores para añadir una nueva cancha -->
     <a href="{{ url_for('main.add_court') }}" class="btn btn-primary mb-3">+ Nueva Cancha</a>
 {% endif %}
 
@@ -24,12 +26,14 @@
         </tr>
     </thead>
     <tbody>
+        {# Se listan todas las canchas registradas #}
         {% for court in courts %}
         <tr>
             <td>{{ court.id }}</td>
             <td>{{ court.name }}</td>
             <td>{{ court.type }}</td>
             <td>
+                {# Badge verde si la cancha está disponible, gris si no #}
                 {% if court.availability %}
                     <span class="badge bg-success">Disponible</span>
                 {% else %}
@@ -40,6 +44,7 @@
             {% endif %}
         </tr>
         {% else %}
+        {# Mensaje cuando no hay canchas registradas #}
         <tr>
             <td colspan="{% if current_user.role == 'administrador' %}5{% else %}4{% endif %}" class="text-center text-muted">No hay canchas registradas.</td>
         </tr>

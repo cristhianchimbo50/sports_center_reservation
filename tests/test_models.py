@@ -3,8 +3,6 @@ from app.models import User, Court, Reservation, ReservationSlot, Payment, Court
 from werkzeug.security import generate_password_hash
 from datetime import date, time, datetime
 
-# --- FIxtures para instancias básicas ---
-
 @pytest.fixture
 def user():
     return User(username='cliente1', password=generate_password_hash('1234'), role='cliente')
@@ -33,13 +31,10 @@ def slot():
 def payment(reservation):
     return Payment(reservation_id=1, amount=10.0, payment_date=datetime.now(), status='Paid')
 
-
-# --- Pruebas unitarias por clase/modelo ---
-
 def test_user_creation(user):
     assert user.username == 'cliente1'
     assert user.role == 'cliente'
-    assert user.password != '1234'  # Debe estar hasheada
+    assert user.password != '1234'
 
 def test_admin_role(admin):
     assert admin.role == 'administrador'
@@ -69,7 +64,6 @@ def test_payment(payment):
     assert payment.status == 'Paid'
     assert isinstance(payment.payment_date, datetime)
 
-# Si tienes métodos extra como is_admin, is_cliente, agrégalos aquí:
 def test_user_roles(user, admin):
     assert hasattr(user, 'is_cliente')
     assert user.is_cliente()

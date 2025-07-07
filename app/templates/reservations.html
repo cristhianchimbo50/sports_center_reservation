@@ -3,6 +3,7 @@
 {% block content %}
 
 <h2 class="mb-4">
+    {# Título según el rol del usuario #}
     {% if current_user.role == 'administrador' %}
     Todas las Reservas
     {% else %}
@@ -11,7 +12,8 @@
 </h2>
 
 {% if current_user.role == 'cliente' %}
-<a href="{{ url_for('main.add_reservation') }}" class="btn btn-primary mb-3">Nueva Reserva</a>
+    <!-- Botón solo para clientes para agregar nueva reserva -->
+    <a href="{{ url_for('main.add_reservation') }}" class="btn btn-primary mb-3">Nueva Reserva</a>
 {% endif %}
 
 {% if reservations %}
@@ -30,12 +32,14 @@
         </tr>
     </thead>
     <tbody>
+        {# Listado de reservas, con campos variables según el rol #}
         {% for r in reservations %}
         <tr>
             <td>{{ r.date.strftime('%d/%m/%Y') }}</td>
             <td><strong>{{ r.court.name }}</strong> ({{ r.court.type }})</td>
             <td>
                 {% if r.slots %}
+                {# Muestra todos los horarios reservados en badges #}
                 {% for slot in r.slots %}
                 <span class="badge bg-info text-dark mb-1">
                     {{ slot.start_time.strftime('%I:%M %p') }} - {{ slot.end_time.strftime('%I:%M %p') }}
@@ -50,13 +54,14 @@
             <td>{{ r.status }}</td>
             <td>
                 {% if r.payment %}
+                {# Muestra monto pagado y estado del pago #}
                 ${{ '%.2f' % r.payment.amount }} <span class="badge bg-success">{{ r.payment.status }}</span>
                 {% else %}
                 <span class="badge bg-secondary">Sin pago</span>
                 {% endif %}
             </td>
             <td>
-                <!-- Botón ver detalles -->
+                <!-- Botón para abrir el modal de detalles de la reserva -->
                 <button type="button" class="btn btn-outline-info btn-sm" data-bs-toggle="modal"
                     data-bs-target="#detalleReservaModal" onclick="showReservaDetalle('{{ r.id }}')">
                     <i class="bi bi-eye"></i>
@@ -67,6 +72,7 @@
     </tbody>
 </table>
 {% else %}
+{# Alerta si no hay reservas para mostrar #}
 <div class="alert alert-info mt-3">
     {% if current_user.role == 'administrador' %}
     No hay reservas registradas.
@@ -76,7 +82,7 @@
 </div>
 {% endif %}
 
-<!-- Modal para detalles de reserva -->
+<!-- Modal para mostrar el detalle de una reserva seleccionada -->
 <div class="modal fade" id="detalleReservaModal" tabindex="-1" aria-labelledby="detalleReservaModalLabel"
     aria-hidden="true">
     <div class="modal-dialog">
@@ -93,6 +99,10 @@
 </div>
 
 <script>
+/* 
+  Objeto global con los datos de las reservas renderizados por el backend.
+  Se usa para mostrar los detalles de una reserva en el modal (ver JS).
+*/
 window.RESERVAS = [
     {% for r in reservations %}
     {
@@ -115,6 +125,5 @@ window.RESERVAS = [
 ];
 </script>
 <script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
-
 
 {% endblock %}

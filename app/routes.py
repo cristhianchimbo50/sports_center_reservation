@@ -6,12 +6,9 @@ from .models import User, Court, Reservation, CourtSchedule, ReservationSlot, Pa
 import datetime
 from functools import wraps
 
-# Definir el Blueprint
 main_bp = Blueprint('main', __name__, url_prefix='/')
 
-
-# ------------------ Decoradores de Rol ------------------
-
+# Decorador para restringir acceso solo a administradores
 def admin_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
@@ -21,6 +18,7 @@ def admin_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
+# Decorador para restringir acceso solo a clientes
 def cliente_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
@@ -30,11 +28,9 @@ def cliente_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
-# ------------------ Auth ------------------
-
 @login_manager.user_loader
 def load_user(user_id):
-    return User.query.get(int(user_id))
+    return db.session.get(User, int(user_id))
 
 @main_bp.route('/')
 def home():
@@ -51,7 +47,7 @@ def register():
             return redirect(url_for('main.register'))
 
         hashed_password = generate_password_hash(password)
-        user = User(username=username, password=hashed_password, role='cliente')  # Siempre cliente
+        user = User(username=username, password=hashed_password, role='cliente')
         db.session.add(user)
         db.session.commit()
 
@@ -80,8 +76,6 @@ def login():
 def logout():
     logout_user()
     return redirect(url_for('main.login'))
-
-# ------------------ Gestión de Canchas ------------------
 
 @main_bp.route('/courts')
 @login_required
@@ -114,8 +108,6 @@ def add_court():
 
     return render_template('add_court.html')
 
-# ------------------ Gestión de Horarios de Canchas ------------------
-
 @main_bp.route('/court-schedules/<int:court_id>', methods=['GET', 'POST'])
 @admin_required
 def manage_court_schedule(court_id):
@@ -140,8 +132,6 @@ def manage_court_schedule(court_id):
 
     schedules = CourtSchedule.query.filter_by(court_id=court.id).all()
     return render_template('manage_court_schedule.html', court=court, schedules=schedules)
-
-# ------------------ Reservas ------------------
 
 @main_bp.route('/reservations')
 @login_required
@@ -168,11 +158,11 @@ def add_reservation():
             return redirect(url_for('main.add_reservation'))
 
         selected_date = datetime.date.fromisoformat(date_str)
-        court = Court.query.get(court_id)
+        court = db.session.get(Court, court_id)
         price_per_hour = float(court.price_per_hour)
         total_to_pay = price_per_hour * len(selected_slots)
 
-        # Validar que los slots realmente están disponibles
+        # Validar que cada slot no esté ya reservado
         for slot in selected_slots:
             start_str, end_str = slot.split('-')
             start_time = datetime.datetime.strptime(start_str, '%H:%M').time()
@@ -191,17 +181,16 @@ def add_reservation():
                 flash(f'La franja {slot} ya está reservada. Seleccione solo horarios disponibles.')
                 return redirect(url_for('main.add_reservation'))
 
-        # 1. Crear reserva principal
+        # Crear reserva, slots y pago
         reservation = Reservation(
             user_id=current_user.id,
             court_id=court_id,
             date=selected_date,
-            status='Paid'  # O 'Pendiente', según tu flujo
+            status='Paid'
         )
         db.session.add(reservation)
         db.session.commit()
 
-        # 2. Insertar slots seleccionados
         for slot in selected_slots:
             start_str, end_str = slot.split('-')
             start_time = datetime.datetime.strptime(start_str, '%H:%M').time()
@@ -214,7 +203,6 @@ def add_reservation():
             db.session.add(slot_obj)
         db.session.commit()
 
-        # 3. Guardar el pago asociado
         payment = Payment(
             reservation_id=reservation.id,
             amount=total_to_pay,
@@ -228,8 +216,6 @@ def add_reservation():
         return redirect(url_for('main.list_reservations'))
 
     return render_template('add_reservation.html', courts=courts)
-
-# ------------------ API Horarios disponibles ------------------
 
 @main_bp.route('/api/available-hours', methods=['GET'])
 @login_required
@@ -246,12 +232,14 @@ def api_available_hours():
     except Exception:
         return jsonify({'error': 'Datos inválidos'}), 400
 
+    # Genera todas las franjas horarias de 1h entre 05:00 y 23:00
     slots = []
     for h in range(5, 24):
         start_time = datetime.time(hour=h, minute=0)
         end_time = (datetime.datetime.combine(datetime.date.today(), start_time) + datetime.timedelta(hours=1)).time()
         slots.append({'start': start_time.strftime('%H:%M'), 'end': end_time.strftime('%H:%M')})
 
+    # Busca slots ya ocupados para ese día y cancha
     ocupados = (
         db.session.query(ReservationSlot)
         .join(Reservation)
@@ -270,9 +258,6 @@ def api_available_hours():
 
     return jsonify({'hours': result})
 
-# ------------------ Error 401 ------------------
-
 @main_bp.app_errorhandler(401)
 def unauthorized(error):
     return render_template('401.html'), 401
-

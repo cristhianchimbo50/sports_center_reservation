@@ -10,6 +10,7 @@
         <select name="court_id" id="courtSelect" class="form-select" required>
             <option value="">Seleccione una cancha</option>
             {% for court in courts %}
+            <!-- Se listan todas las canchas disponibles para reservar -->
             <option value="{{ court.id }}" data-price="{{ court.price_per_hour }}">{{ court.name }} ({{ court.type }})</option>
             {% endfor %}
         </select>
@@ -22,22 +23,26 @@
 
     <div class="mb-3">
         <label class="form-label">Horarios disponibles</label>
+        <!-- Aquí se cargan dinámicamente los horarios disponibles según la cancha y fecha seleccionadas -->
         <div id="slotsContainer" class="mb-2"></div>
     </div>
 
     <div class="mb-3">
         <label class="form-label">Precio por hora: </label>
+        <!-- Se muestra el precio por hora de la cancha seleccionada -->
         <span id="pricePerHour" class="fw-bold">$0.00</span>
     </div>
     <div class="mb-3">
         <label class="form-label">Total a pagar:</label>
+        <!-- Se calcula y muestra el monto total según los horarios seleccionados -->
         <span id="totalAmount" class="fw-bold">$0.00</span>
     </div>
 
+    <!-- Botón para abrir el modal de pago, habilitado solo cuando se seleccionan horarios -->
     <button type="button" class="btn btn-success" id="openPaymentModal" disabled>Reservar</button>
 </form>
 
-<!-- Modal de pago Bootstrap -->
+<!-- Modal de pago Bootstrap para ingresar los datos de pago y confirmar la reserva -->
 <div class="modal fade" id="paymentModal" tabindex="-1" aria-labelledby="paymentModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -57,6 +62,7 @@
           </div>
           <div class="mb-3">
             <label>Monto a pagar</label>
+            <!-- Campo solo lectura que muestra el total calculado -->
             <input type="text" class="form-control" id="modalAmount" readonly>
           </div>
         </div>
@@ -68,7 +74,7 @@
   </div>
 </div>
 
+<!-- Se enlaza el script que maneja la lógica de horarios, precios y pago -->
 <script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
-
 
 {% endblock %}

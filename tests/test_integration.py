@@ -5,7 +5,7 @@ from datetime import date
 
 @pytest.fixture
 def client():
-    # Crea una app de testing con base en memoria
+    # Crea una app de testing con base en memoria, agrega una cancha de prueba y limpia al final
     app = create_app({
         "TESTING": True,
         "SQLALCHEMY_DATABASE_URI": "sqlite:///:memory:",
@@ -14,13 +14,11 @@ def client():
     })
     with app.app_context():
         db.create_all()
-        # Cancha de prueba
         court = Court(name="Cancha Test", type="Fútbol", availability=True, price_per_hour=15.0)
         db.session.add(court)
         db.session.commit()
     with app.test_client() as client:
         yield client
-    # Limpieza
     with app.app_context():
         db.drop_all()
 
